@@ -1,0 +1,316 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct PESSOA {
+
+  char nome[20];
+
+  char CPF[11];
+
+  int idade;
+
+  float altura;
+
+}
+
+PESSOA;
+
+typedef struct NO {
+
+  PESSOA dados;
+
+  struct NO * prox;
+
+}
+
+NO;
+
+void empilhar(NO ** pilha, PESSOA valor) {
+
+  NO * novono = (NO * ) malloc(sizeof(NO));
+
+  novono -> dados = valor;
+
+  novono -> prox = * pilha;
+
+  * pilha = novono;
+
+}
+
+void desempilhar(NO ** pilha) {
+
+  if ( * pilha == NULL) {
+
+  } else {
+
+    NO * aux = * pilha;
+
+    * pilha = aux -> prox;
+
+    free(aux);
+
+  }
+
+}
+
+void imp(NO * pilha) {
+
+  NO * aux = pilha;
+
+  while (aux != NULL) {
+
+    printf("Nome: %s\n", aux -> dados.nome);
+
+    printf("CPF: %s\n", aux -> dados.CPF);
+
+    printf("Idade: %d\n", aux -> dados.idade);
+
+    printf("Altura: %.2f\n", aux -> dados.altura);
+
+    printf("-------------------------\n");
+
+    aux = aux -> prox;
+
+  }
+
+}
+
+void insinicio(NO ** pilha, PESSOA valor) {
+
+  NO * novono = (NO * ) malloc(sizeof(NO));
+
+  novono -> dados = valor;
+
+  novono -> prox = * pilha;
+
+  * pilha = novono;
+
+}
+
+int convchar(char c) {
+
+  return c - '0';
+
+}
+
+int testacpf(char * CPF) {
+
+  int dig1, dig2, soma = 0;
+
+  for (int i = 0; i <= 8; i++) {
+
+    soma += convchar(CPF[i]) * (10 - i);
+
+  }
+
+  if (soma % 11 <= 1) {
+
+    dig1 = 0;
+
+  } else {
+
+    dig1 = 11 - (soma % 11);
+
+  }
+
+  if (dig1 != convchar(CPF[9])) {
+
+    printf("CPF inválido.\n");
+
+    return 0;
+
+  }
+
+  soma = 0;
+
+  for (int i = 0; i < 10; i++) {
+
+    soma += convchar(CPF[i]) * (11 - i);
+
+  }
+
+  if (soma % 11 < 2) {
+
+    dig2 = 0;
+
+  } else {
+
+    dig2 = 11 - (soma % 11);
+
+  }
+
+  if (dig2 != convchar(CPF[10])) {
+
+    printf("CPF inválido. \n");
+
+    return 0;
+
+  }
+
+  printf("CPF válido.\n");
+
+  return 1;
+
+}
+
+void OrdenarPorIdade(NO* lista) { 
+    NO* fim = NULL;
+    while (lista != fim) {
+        NO* atual = lista;
+        while (atual->prox != fim) {
+            if (atual->dados.idade > atual->prox->dados.idade) {
+                PESSOA temp = atual->dados;
+                atual->dados = atual->prox->dados;
+                atual->prox->dados = temp;
+            }
+            atual = atual->prox;
+        }
+        fim = atual;
+    }
+
+    printf("\n--- Lista ordenada por idade (Bubble Sort) ---\n");
+    imp(lista);
+}
+
+void OrdenarPorAltura(NO* lista) {
+    for (NO* i = lista; i != NULL && i->prox != NULL; i = i->prox) {
+        NO* min = i;
+        for (NO* j = i->prox; j != NULL; j = j->prox) {
+            if (j->dados.altura < min->dados.altura) {
+                min = j;
+            }
+        }
+        if (min != i) {
+            PESSOA temp = i->dados;
+            i->dados = min->dados;
+            min->dados = temp;
+        }
+    }
+
+    printf("\n--- Lista ordenada por altura (Selection Sort) ---\n");
+    imp(lista);
+}
+
+
+int main() {
+
+  printf("Bem vindo ao sistema de cadastros!\n");
+
+  printf("Deseja cadastrar quantos indivíduos?\n");
+
+  int tam, d;
+
+  scanf("%d", & tam);
+
+  PESSOA * funcionario = (PESSOA * ) malloc(tam * sizeof(PESSOA));
+
+  for (int i = 0; i <= tam - 1; i++) {
+
+    printf("Digite os dados do funcionario %d\n", i + 1);
+
+    printf("Digite o nome:");
+
+    scanf("%s", funcionario[i].nome);
+
+
+    //verificar a idade  
+    do {
+
+      printf("Digite a idade: ");
+
+      scanf("%d", & d);
+
+      if (d <= 150) {
+
+        printf("Idade válida\n");
+
+      } else {
+
+        printf("Digite uma idade válida.\n");
+
+      }
+
+    } while (d > 150);
+
+    funcionario[i].idade = d;
+    
+    
+    //verificar cpf  
+    do {
+
+      printf("Digite o CPF: ");
+
+      scanf("%11s", funcionario[i].CPF);
+
+    } while (!testacpf(funcionario[i].CPF));
+
+
+    //verificar a altura  
+    float alt;
+
+    do {
+
+      printf("Digite a altura em metros: ");
+
+      scanf("%f", & alt);
+
+      if (alt >= 0.0 && alt <= 3.0) {
+
+        printf("Altura válida\n");
+
+      } else {
+
+        printf("Digite uma altura válida.\n");
+
+      }
+
+    } while (alt < 0.0 || alt > 3.0);
+
+    funcionario[i].altura = alt;
+
+  }
+
+  printf("\n--- Lista de funcionários ---\n");
+
+  for (int i = 0; i <= tam - 1; i++) {
+
+    printf("Funcionário %d \n", i + 1);
+
+    printf("Nome: %s \n", funcionario[i].nome);
+
+    printf("Idade: %d \n", funcionario[i].idade);
+
+    printf("CPF: %s \n", funcionario[i].CPF);
+
+    printf("Altura: %.2f \n", funcionario[i].altura);
+
+  }
+
+  NO * p = NULL;
+
+  for (int i = 0; i <= tam - 1; i++) {
+
+    empilhar( & p, funcionario[i]);
+  }
+  desempilhar (&p); 
+
+  PESSOA Ana = {"Ana", "11111111111", 31,1.67};
+
+  PESSOA Pedro = { "Pedro", "22222222222", 45, 1.78 };
+
+  empilhar( & p, Ana);
+
+  empilhar( & p, Pedro);
+
+  printf("\n---Pilha de Funcionários---\n");
+  imp(p);
+  
+  OrdenarPorIdade(p);
+  
+  OrdenarPorAltura(p);
+ 
+ 
+  return 0;
+
+}
